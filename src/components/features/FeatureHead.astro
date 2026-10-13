@@ -1,0 +1,148 @@
+---
+import IconDownload from '../IconDownload.astro';
+import type { ReleaseInfo } from '../../lib/github';
+import { formatCount } from '../../lib/github';
+
+interface Props {
+  kicker: string;
+  name: string;
+  lede: string;
+  repo: string;
+  release: ReleaseInfo | null;
+  warm?: boolean;
+}
+const { kicker, name, lede, repo, release, warm = false } = Astro.props;
+---
+
+<header class:list={['head', 'wrap', { 'head--warm': warm }]}>
+  <div class="text">
+    <p class="kicker">{kicker}</p>
+    <h1 class="title" data-motion="title">{name}</h1>
+    <p class="lede">{lede}</p>
+  </div>
+  <div class="side">
+    {release && <span class="version">{release.version}</span>}
+    <a class:list={['btn', { 'btn--warm': warm }]} href={`${repo}/releases/latest`} rel="noopener">
+      <IconDownload /> 다운로드
+    </a>
+    <a class="repo" href={repo} rel="noopener">
+      GitHub
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+    </a>
+    {release && release.downloads > 0 && (
+      <span class="count">
+        지금까지 <span data-count={release.downloads}>{formatCount(release.downloads)}</span>회 받음
+      </span>
+    )}
+  </div>
+</header>
+<hr class="rule" />
+
+<style>
+  /* Hallmark · macrostructure: custom (Feature Showcase: 2 lead rows + grid + line list)
+   * genre: atmospheric · theme: Midnight (mint / warm accent-2 per page) · nav: N9 · footer: Ft5
+   * audit 2026-10-13 · contrast: pass (40–41) · mobile: pass (34, 49, 50–57) · tokens: pass (48)
+   * honest: '준비 중' 빗금 블록은 출시 전 교체 (46) · chrome: pass (47)
+   */
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--space-xl);
+    padding: var(--space-3xl) 0 var(--space-2xl);
+  }
+  .kicker {
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+    letter-spacing: 0.14em;
+    margin: 0 0 var(--space-md);
+  }
+  .title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-display-s);
+    line-height: 1.05;
+    color: var(--color-accent);
+    text-shadow:
+      0 0 6px var(--color-glow-strong),
+      0 0 22px var(--color-glow),
+      0 0 70px var(--color-glow-wide);
+  }
+  .head--warm .title {
+    color: var(--color-accent-2);
+    text-shadow:
+      0 0 6px var(--color-glow-2),
+      0 0 22px var(--color-glow-2),
+      0 0 70px var(--color-glow-2-soft);
+  }
+  .title :global(.ch) {
+    display: inline-block;
+  }
+  .lede {
+    max-width: 48ch;
+    margin: var(--space-lg) 0 0;
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .side {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .version {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    white-space: nowrap;
+    border: 1px solid var(--color-accent-line);
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
+    box-shadow: 0 0 14px var(--color-accent-tint) inset;
+  }
+  .head--warm .version {
+    color: var(--color-accent-2);
+    border-color: var(--color-accent-2-line);
+    box-shadow: 0 0 14px var(--color-accent-2-tint) inset;
+  }
+  .repo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .repo:hover {
+    color: var(--color-ink);
+  }
+  .count {
+    flex-basis: 100%;
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .rule {
+    border: 0;
+    height: 2px;
+    margin: 0;
+    background: var(--color-accent);
+    box-shadow: 0 0 18px var(--color-glow);
+  }
+  .head--warm + .rule {
+    background: var(--color-accent-2);
+    box-shadow: 0 0 18px var(--color-glow-2);
+  }
+  @media (max-width: 768px) {
+    .head {
+      grid-template-columns: 1fr;
+      align-items: start;
+      padding-top: var(--space-3xl);
+    }
+    .count {
+      flex-basis: auto;
+    }
+  }
+</style>

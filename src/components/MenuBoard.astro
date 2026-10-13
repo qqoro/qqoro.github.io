@@ -1,0 +1,215 @@
+---
+import { Image } from 'astro:assets';
+import IconDownload from './IconDownload.astro';
+import yasig from '../assets/screenshots/yasig-library.png';
+import doujin from '../assets/screenshots/doujin-library.png';
+import type { ReleaseInfo } from '../lib/github';
+import { formatCount } from '../lib/github';
+
+interface Props {
+  yasig: ReleaseInfo | null;
+  doujin: ReleaseInfo | null;
+}
+const rel = Astro.props;
+
+const items = [
+  {
+    id: 'yasig',
+    name: '야식메뉴판 Plus',
+    desc: '게임 폴더를 썸네일 갤러리로. 정보는 알아서 채워지고, 별점·태그·플레이 시간으로 정리합니다.',
+    img: yasig,
+    alt: '야식메뉴판 Plus 라이브러리 화면',
+    repo: 'https://github.com/qqoro/yasig-menu-plus',
+    more: '/yasig-menu-plus.html',
+    release: rel.yasig,
+    warm: false,
+  },
+  {
+    id: 'doujin',
+    name: '동인메뉴판',
+    desc: '만화 라이브러리와 뷰어를 하나로. 시리즈는 알아서 묶이고, 신작도 알아서 찾아옵니다.',
+    img: doujin,
+    alt: '동인메뉴판 라이브러리 화면',
+    repo: 'https://github.com/qqoro/doujin-menu',
+    more: '/doujin-menu.html',
+    release: rel.doujin,
+    warm: true,
+  },
+];
+---
+
+<section class="menu wrap" id="menu">
+  <div class="head reveal">
+    <h2>오늘의 메뉴</h2>
+    <p>둘 다 무료 · MIT · 설치형 / 포터블</p>
+  </div>
+  <div class="board">
+    {
+      items.map((it) => (
+        <div class="slot">
+        <span class:list={['glow', { 'glow--warm': it.warm }]} aria-hidden="true"></span>
+        <article class:list={['item', { 'item--warm': it.warm }]} data-motion="card">
+          <div class="top">
+            <h3 class="name">{it.name}</h3>
+            {it.release && <span class="price">{it.release.version}</span>}
+          </div>
+          <p class="desc">{it.desc}</p>
+          <figure>
+            <Image src={it.img} alt={it.alt} width={1200} format="webp" quality={78} loading="lazy" />
+          </figure>
+          <div class="cta">
+            <a class:list={['btn', { 'btn--warm': it.warm }]} href={`${it.repo}/releases/latest`} rel="noopener">
+              <IconDownload /> 다운로드
+            </a>
+            <a class="btn btn--ghost" href={it.more}>
+              자세히
+            </a>
+            {it.release && it.release.downloads > 0 && (
+              <span class="count">
+                지금까지 <span data-count={it.release.downloads}>{formatCount(it.release.downloads)}</span>회 받음
+              </span>
+            )}
+          </div>
+        </article>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .menu {
+    padding: var(--space-3xl) 0;
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+    flex-wrap: wrap;
+  }
+  .head h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-display-s);
+    line-height: 1;
+  }
+  .head p {
+    color: var(--color-ink-2);
+    margin: 0;
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+    gap: var(--space-lg);
+  }
+  .slot {
+    position: relative;
+  }
+  /* 간판 뒤에서 천천히 흔들리는 불빛 */
+  .glow {
+    position: absolute;
+    inset: 12% -8% -10%;
+    z-index: 0;
+    border-radius: var(--radius-lg);
+    background: radial-gradient(60% 60% at 50% 60%, var(--color-glow-soft), transparent 70%);
+    filter: blur(28px);
+    animation: sway 7s var(--ease-in-out) infinite alternate;
+    pointer-events: none;
+  }
+  .glow--warm {
+    background: radial-gradient(60% 60% at 50% 60%, var(--color-glow-2-soft), transparent 70%);
+    animation-delay: -3.5s;
+  }
+  @keyframes sway {
+    from {
+      transform: translate(-3%, 0) scale(1);
+    }
+    to {
+      transform: translate(3%, 2%) scale(1.06);
+    }
+  }
+  .item {
+    position: relative;
+    z-index: 1;
+    background: var(--color-paper-2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    display: grid;
+    gap: var(--space-lg);
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--dur-base) var(--ease-out);
+  }
+  .item:hover {
+    box-shadow: 0 40px 90px -36px var(--color-glow);
+  }
+  .item--warm:hover {
+    box-shadow: 0 40px 90px -36px var(--color-glow-2);
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+  .name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-2xl);
+    line-height: 1.1;
+  }
+  .price {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    white-space: nowrap;
+    border: 1px solid var(--color-accent-line);
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
+    box-shadow: 0 0 14px var(--color-accent-tint) inset;
+  }
+  .item--warm .price {
+    color: var(--color-accent-2);
+    border-color: var(--color-accent-2-line);
+    box-shadow: 0 0 14px var(--color-accent-2-tint) inset;
+  }
+  .desc {
+    color: var(--color-ink-2);
+    margin: 0;
+    max-width: 48ch;
+  }
+  figure {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    background: var(--color-paper-3);
+  }
+  figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top;
+  }
+  .cta {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .count {
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .item {
+      transition: none;
+    }
+    .glow {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import Shot from './Shot.astro';
+
+export interface GridItem {
+  title: string;
+  body: string;
+  img: ImageMetadata | null;
+  alt: string;
+  /** 두 칸을 차지하며 가로로 눕는 카드 */
+  wide?: boolean;
+}
+interface Props {
+  items: GridItem[];
+  warm?: boolean;
+}
+const { items, warm = false } = Astro.props;
+---
+
+<section class:list={['grid', 'wrap', { 'grid--warm': warm }]}>
+  {
+    items.map((it) => (
+      <article class:list={['cell', { 'cell--wide': it.wide }]}>
+        <Shot img={it.img} alt={it.alt} width={it.wide ? 1400 : 1000} />
+        <div class="text">
+          <h3>{it.title}</h3>
+          <p>{it.body}</p>
+        </div>
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: var(--space-2xl) var(--space-xl);
+    padding: var(--space-2xl) 0 var(--space-3xl);
+  }
+  .cell {
+    display: grid;
+    gap: var(--space-lg);
+    align-content: start;
+  }
+  /* 디스플레이 서체는 작으면 뭉개지므로 본문 제목보다 한 단계 큰 크기로 쓴다 */
+  .cell h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-xl);
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    word-break: keep-all;
+  }
+  .cell h3::before {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 3px;
+    margin-bottom: var(--space-md);
+    background: var(--color-accent);
+    box-shadow: 0 0 12px var(--color-glow);
+  }
+  .grid--warm .cell h3::before {
+    background: var(--color-accent-2);
+    box-shadow: 0 0 12px var(--color-glow-2);
+  }
+  .cell p {
+    margin: var(--space-sm) 0 0;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+    max-width: 48ch;
+  }
+  .cell--wide {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    align-items: center;
+    gap: var(--space-xl);
+  }
+  @media (max-width: 900px) {
+    .cell--wide {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+  }
+</style>

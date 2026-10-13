@@ -1,0 +1,63 @@
+---
+---
+
+<section class="why wrap">
+  <div class="grid">
+    <h2 class="reveal">텍스트 목록 말고,<br /><span>그림</span>으로 고르세요.</h2>
+    <dl class="reveal">
+      <div>
+        <dt>폴더만 지정하면 시작</dt>
+        <dd>설정 화면을 뒤질 필요 없습니다. 경로 하나 넣으면 썸네일이 채워집니다.</dd>
+      </div>
+      <div>
+        <dt>무료이고, 열려 있습니다</dt>
+        <dd>MIT 라이선스, 코드는 GitHub에 전부 공개. 새 버전은 앱이 알아서 받아옵니다.</dd>
+      </div>
+      <div>
+        <dt>전부 내 PC 안에서</dt>
+        <dd>계정도 서버도 없습니다. SQLite 한 파일이 전부고, 백업도 그 파일 하나입니다.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .why {
+    padding: var(--space-3xl) 0;
+    border-top: 1px solid var(--rule);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-display-s);
+    line-height: 1.05;
+  }
+  h2 span {
+    color: var(--color-accent);
+    text-shadow: 0 0 18px var(--color-glow);
+  }
+  dl {
+    margin: 0;
+    display: grid;
+    gap: var(--space-lg);
+  }
+  dt {
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+  dd {
+    margin: 4px 0 0;
+    color: var(--color-ink-2);
+  }
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

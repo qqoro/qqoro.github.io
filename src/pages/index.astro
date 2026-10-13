@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import MenuBoard from '../components/MenuBoard.astro';
+import FeatureStack from '../components/FeatureStack.astro';
+import Why from '../components/Why.astro';
+import Footer from '../components/Footer.astro';
+import { fetchRelease } from '../lib/github';
+
+const [yasig, doujin] = await Promise.all([
+  fetchRelease('qqoro/yasig-menu-plus'),
+  fetchRelease('qqoro/doujin-menu'),
+]);
+---
+
+<Base
+  title="야식메뉴판 Plus · 동인메뉴판 | qqoro"
+  description="모아둔 게임과 만화를 메뉴판처럼 펼쳐놓고 고르는 Windows 앱 두 개. 폴더만 지정하면 끝."
+>
+  <Nav />
+  <Hero />
+  <MenuBoard yasig={yasig} doujin={doujin} />
+  <FeatureStack />
+  <Why />
+  <Footer />
+</Base>

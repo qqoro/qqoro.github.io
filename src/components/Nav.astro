@@ -1,0 +1,81 @@
+---
+interface Props {
+  current?: 'yasig' | 'doujin';
+}
+const { current } = Astro.props;
+---
+
+<nav class="nav" aria-label="주요">
+  <a class="brand" href="/">
+    <img src="/favicon.svg" alt="" width="32" height="32" />
+    qqoro
+  </a>
+  <div class="links">
+    <a href="/yasig-menu-plus.html" aria-current={current === 'yasig' ? 'page' : undefined}>야식메뉴판</a>
+    <a href="/doujin-menu.html" aria-current={current === 'doujin' ? 'page' : undefined}>동인메뉴판</a>
+    <a class="ext" href="https://github.com/qqoro" rel="noopener">
+      GitHub
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+    </a>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: absolute;
+    inset: 0 0 auto 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+    z-index: 2;
+  }
+  .nav a {
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav a:hover {
+    color: var(--color-ink);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 700;
+    font-size: var(--text-md);
+    color: var(--color-ink);
+    letter-spacing: 0.01em;
+  }
+  .brand img {
+    display: block;
+    border-radius: 8px;
+  }
+  .links {
+    display: flex;
+    gap: var(--space-lg);
+  }
+  .links a[aria-current='page'] {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 6px;
+  }
+  .links a[href='/doujin-menu.html'][aria-current='page'] {
+    text-decoration-color: var(--color-accent-2);
+  }
+  .ext {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  @media (max-width: 768px) {
+    .nav {
+      padding: var(--space-md);
+    }
+    .links {
+      gap: var(--space-md);
+    }
+  }
+</style>

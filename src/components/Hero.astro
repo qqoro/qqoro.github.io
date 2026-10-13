@@ -1,0 +1,118 @@
+---
+---
+
+<header class="hero wrap" data-motion="hero">
+  <h1 class="title" data-motion="title">오늘 밤<br /><em>뭐</em> 할래<span class="off">?</span></h1>
+  <p class="lede" data-motion="lede">
+    뭐 할지 고민하는 시간, 이제 <b>메뉴판 보듯</b> 1분이면 끝.
+  </p>
+  <a class="cue" href="#menu">
+    오늘의 메뉴
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  </a>
+</header>
+<hr class="rule-thick" />
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 88vh;
+    display: grid;
+    align-content: end;
+    padding: var(--space-3xl) 0 var(--space-4xl);
+  }
+  .title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-display);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--color-accent);
+    text-shadow:
+      0 0 6px var(--color-glow-strong),
+      0 0 22px var(--color-glow),
+      0 0 70px var(--color-glow-wide),
+      0 0 140px var(--color-glow-far);
+    animation: flick 3.2s var(--ease-in-out) 1;
+  }
+  .title em {
+    font-style: normal;
+    color: var(--color-ink);
+    text-shadow: 0 0 18px var(--color-ink-glow);
+  }
+  .title .off {
+    color: var(--color-accent-dim);
+    text-shadow: none;
+    animation: buzz 6s steps(2) infinite;
+  }
+  /* JS 점등 연출이 붙으면 CSS 깜빡임은 끈다 */
+  .title.is-js {
+    animation: none;
+  }
+  .title :global(.ch) {
+    display: inline-block;
+  }
+  .lede {
+    max-width: 34ch;
+    margin: var(--space-xl) 0 0;
+    font-size: var(--text-2xl);
+    line-height: 1.35;
+    color: var(--color-ink-2);
+  }
+  .lede b {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* 스크롤 유도 */
+  .cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: var(--space-2xl);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    color: var(--color-ink-3);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .cue:hover {
+    color: var(--color-ink);
+  }
+  .cue svg {
+    animation: bob 1.8s var(--ease-in-out) infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+  }
+
+  .rule-thick {
+    border: 0;
+    height: 4px;
+    background: var(--color-accent);
+    box-shadow: 0 0 18px var(--color-glow);
+    margin: 0;
+  }
+  @keyframes flick {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+    20%, 24%, 55% { opacity: 0.45; }
+  }
+  @keyframes buzz {
+    0%, 92% { opacity: 1; }
+    94%, 100% { opacity: 0.6; }
+  }
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 72vh;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .title,
+    .title .off,
+    .cue svg {
+      animation: none;
+    }
+  }
+</style>

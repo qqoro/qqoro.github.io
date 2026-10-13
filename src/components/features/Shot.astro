@@ -1,0 +1,63 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  img: ImageMetadata | null;
+  alt: string;
+  width?: number;
+  /** 스크롤 기울기 연출. 대표 기능 두 장에만 쓴다 */
+  motion?: boolean;
+}
+const { img, alt, width = 1200, motion = false } = Astro.props;
+---
+
+<figure class="shot" data-motion={motion ? 'shot' : undefined}>
+  {
+    img ? (
+      <Image src={img} alt={alt} width={width} format="webp" quality={78} loading="lazy" />
+    ) : (
+      <div class="pending" role="img" aria-label={`${alt} (스크린샷 준비 중)`}>
+        <span>스크린샷 준비 중</span>
+      </div>
+    )
+  }
+</figure>
+
+<style>
+  .shot {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    background: var(--color-paper-2);
+    box-shadow: var(--shadow-card);
+  }
+  /* 스크린샷은 1920×1080 그대로 보여준다. 자리표시만 같은 비율로 맞춘다 */
+  .shot img,
+  .pending {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .pending {
+    aspect-ratio: 16 / 9;
+  }
+  /* 아직 찍지 않은 자리. 가짜 화면 대신 빗금으로 비워 둔다 */
+  .pending {
+    display: grid;
+    place-items: center;
+    color: var(--color-ink-3);
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+    background: repeating-linear-gradient(
+      135deg,
+      var(--color-paper-2) 0 18px,
+      var(--color-paper-3) 18px 20px
+    );
+  }
+  .pending span {
+    padding: var(--space-sm) 12px;
+    border-radius: var(--radius-pill);
+    background: var(--color-paper);
+    border: 1px dashed var(--color-ink-3);
+  }
+</style>

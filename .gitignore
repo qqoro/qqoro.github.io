@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.playwright-mcp/
+.claude/shots/
+.env
+.env.*
+.DS_Store
+Thumbs.db

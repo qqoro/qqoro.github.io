@@ -1,0 +1,138 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import FeatureHead from '../components/features/FeatureHead.astro';
+import FeatureLead from '../components/features/FeatureLead.astro';
+import FeatureGrid from '../components/features/FeatureGrid.astro';
+import FeatureChips from '../components/features/FeatureChips.astro';
+import CrossLink from '../components/features/CrossLink.astro';
+import { fetchRelease } from '../lib/github';
+import yasigLibrary from '../assets/screenshots/yasig-library.png';
+import yasigDetail from '../assets/screenshots/yasig-detail.png';
+import yasigStats from '../assets/screenshots/yasig-2.png';
+import yasigSearch from '../assets/screenshots/yasig-search.png';
+import yasigEdit from '../assets/screenshots/yasig-edit.png';
+import yasigDuplicates from '../assets/screenshots/yasig-duplicates.png';
+import yasigRename from '../assets/screenshots/yasig-rename.png';
+import yasigTranslation from '../assets/screenshots/yasig-translation.png';
+import yasigMcp from '../assets/screenshots/yasig-mcp.png';
+
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4
+ * page: 야식메뉴판 Plus 기능 · genre: atmospheric · theme: Midnight (brand-mint)
+ * macrostructure: custom (Feature Showcase) · CSS 스탬프는 FeatureHead.astro
+ * honest: 없는 스크린샷은 '준비 중' 빗금 블록 (46) · chrome: none (47) · tokens: pass (48)
+ */
+
+const repo = 'https://github.com/qqoro/yasig-menu-plus';
+const release = await fetchRelease('qqoro/yasig-menu-plus');
+
+const lead = [
+  {
+    title: '폴더가 그대로 메뉴판이 됩니다',
+    body: '게임 폴더 경로 하나면 끝입니다. 하위 폴더를 훑어 썸네일 갤러리로 펼치고, 압축 파일도 풀지 않고 그대로 인식합니다. 카드 보기와 이미지 보기 중 보기 편한 쪽으로 골라 봅니다.',
+    img: yasigLibrary,
+    alt: '야식메뉴판 Plus 라이브러리, 썸네일 갤러리',
+  },
+  {
+    title: '정보는 묻지 않고 채워집니다',
+    body: '폴더 이름에 RJ01234567 같은 번호만 있으면 DLSite에서 썸네일·서클·태그·평점·판매 수를 받아옵니다. Steam은 ST, Getchu는 GC, Ci-en도 됩니다. 새 폴더를 넣으면 창을 켤 때 알아서 반영됩니다.',
+    img: yasigDetail,
+    alt: '야식메뉴판 Plus 게임 상세 화면, 수집된 메타데이터',
+  },
+];
+
+const grid = [
+  {
+    title: '찾고 싶은 게 바로',
+    body: '태그·서클로 검색하고, 보기 싫은 건 제외 검색으로 뺍니다. 별점이나 다운로드 수로 줄 세우고, 고르기 귀찮으면 랜덤으로 하나 뽑습니다.',
+    img: yasigSearch,
+    alt: '야식메뉴판 Plus 태그·서클 검색과 즐겨찾기 필터 적용 결과',
+  },
+  {
+    title: '나만의 정리',
+    body: '별점을 매기고, 태그를 달고, 즐겨찾기로 모아 둡니다. 사이트 평점과 내 별점을 따로 봅니다.',
+    img: yasigEdit,
+    alt: '야식메뉴판 Plus 게임 상세 정보 편집, 별점·즐겨찾기·태그',
+  },
+  {
+    title: '얼마나 했는지도 기록됩니다',
+    body: '실행부터 종료까지 플레이 시간을 재고, 요일별·시간대별로 보여줍니다. 별점 분포로 어떤 게임을 좋아하는지까지.',
+    img: yasigStats,
+    alt: '야식메뉴판 Plus 플레이 통계 대시보드',
+  },
+  {
+    title: '같은 게임이 두 개면 알려줍니다',
+    body: '중복으로 들어온 게임을 찾아 한 화면에 모아 줍니다. 뭘 지울지만 고르면 됩니다.',
+    img: yasigDuplicates,
+    alt: '야식메뉴판 Plus 중복 게임 관리, 외부 ID 기준 중복 그룹',
+  },
+  {
+    title: '이름도 알아서 맞춥니다',
+    body: '수집한 메타데이터로 파일명을 한 번에 바꿉니다. 번호만 있던 이름에 제목이 붙습니다.',
+    img: yasigRename,
+    alt: '야식메뉴판 Plus 파일명 관리, 템플릿 미리보기 목록',
+  },
+  {
+    title: '제목은 한국어로',
+    body: '일본어 제목은 한국어로 자동 번역해 둡니다. 읽을 수 있어야 고를 수 있으니까.',
+    img: yasigTranslation,
+    alt: '야식메뉴판 Plus 설정, 게임 제목 번역과 제목 표시 우선순위',
+  },
+  {
+    title: '손 가는 정리는 AI한테 맡깁니다',
+    body: 'MCP 서버가 내장되어 있어 Claude 같은 AI 클라이언트가 라이브러리를 직접 읽고 고칩니다. 자동 번역이 ○ 같은 기호에 걸려 엉망이 된 제목을 다시 번역시키거나, 메모·태그·별점을 한꺼번에 정리하는 식으로. 하나씩 열어서 고칠 필요가 없습니다.',
+    img: yasigMcp,
+    alt: '야식메뉴판 Plus 설정, MCP 서버와 AI 클라이언트 등록 명령',
+    wide: true,
+  },
+];
+
+const chips = [
+  'Steam 콜렉터 (ST)',
+  'DLSite 콜렉터 (RJ·BJ·VJ)',
+  'Getchu 콜렉터 (GC)',
+  'Ci-en 콜렉터 (CE)',
+  'Google 이미지 썸네일',
+  '압축 파일 그대로 인식',
+  '새 폴더 자동 반영',
+  '썸네일 갤러리',
+  '카드·이미지 보기 모드',
+  '태그·서클 검색',
+  '제외 검색',
+  '별점·다운로드 수 정렬',
+  '랜덤 선택',
+  '별점·태그·즐겨찾기',
+  '사이트 별점 수집',
+  '플레이 시간 기록',
+  '요일별·시간대별 통계',
+  '별점 분포',
+  '중복 게임 찾기',
+  '파일명 일괄 변경',
+  '제목 한국어 번역',
+  'MCP로 AI가 메타데이터 편집',
+  '앱 내 도움말 (F1)',
+  '인스톨러·포터블',
+  'MIT 무료',
+];
+---
+
+<Base
+  title="야식메뉴판 Plus 기능 | qqoro"
+  description="폴더만 지정하면 썸네일·정보·플레이 시간이 알아서 채워지는 Windows 게임 라이브러리. 야식메뉴판 Plus가 하는 일 전부."
+  ogImage="/og-yasig.png"
+>
+  <Nav current="yasig" />
+  <FeatureHead
+    kicker="기능 소개"
+    name="야식메뉴판 Plus"
+    lede="폴더를 지정하는 것 말고는 할 일이 없습니다."
+    repo={repo}
+    release={release}
+  />
+  <FeatureLead items={lead} />
+  <FeatureGrid items={grid} />
+  <FeatureChips title="전부 다 적어보면" lede="위에 못 담은 것까지 한 줄씩." items={chips} />
+  <CrossLink lead="만화는 이쪽" name="동인메뉴판" href="/doujin-menu.html" warm />
+  <Footer />
+</Base>

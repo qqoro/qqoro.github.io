@@ -1,0 +1,144 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import FeatureHead from '../components/features/FeatureHead.astro';
+import FeatureLead from '../components/features/FeatureLead.astro';
+import FeatureGrid from '../components/features/FeatureGrid.astro';
+import FeatureChips from '../components/features/FeatureChips.astro';
+import CrossLink from '../components/features/CrossLink.astro';
+import { fetchRelease } from '../lib/github';
+import doujinLibrary from '../assets/screenshots/doujin-library.png';
+import doujinSubscription from '../assets/screenshots/doujin-subscription.png';
+import doujinSeries from '../assets/screenshots/doujin-series.png';
+import doujinDuplicates from '../assets/screenshots/doujin-duplicates.png';
+import doujinViewer from '../assets/screenshots/doujin-viewer.png';
+import doujinSearch from '../assets/screenshots/doujin-search.png';
+import doujinBrowse from '../assets/screenshots/doujin-browse.png';
+import doujinQueue from '../assets/screenshots/doujin-queue.png';
+import doujinStats from '../assets/screenshots/doujin-statistics.png';
+
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4
+ * page: 동인메뉴판 기능 · genre: atmospheric · theme: Midnight (warm accent-2)
+ * macrostructure: custom (Feature Showcase) · CSS 스탬프는 FeatureHead.astro
+ * honest: 없는 스크린샷은 '준비 중' 빗금 블록 (46) · chrome: none (47) · tokens: pass (48)
+ */
+
+const repo = 'https://github.com/qqoro/doujin-menu';
+const release = await fetchRelease('qqoro/doujin-menu');
+
+const lead = [
+  {
+    title: '폴더째로 넣으면 끝입니다',
+    body: 'ZIP이든 CBZ든 풀지 않습니다. Hitomi-Downloader로 받은 책이면 info.txt를 읽어 작가·태그·시리즈까지 채워 둡니다. 넣고 나면 할 일이 없습니다.',
+    img: doujinLibrary,
+    alt: '동인메뉴판 라이브러리, 표지 격자',
+  },
+  {
+    title: '다음 책이 바로 열립니다',
+    body: '마지막 장을 넘기면 목록의 다음 책이 바로 뜹니다. 시리즈 다음 권으로는 단축키 한 번. 어디까지 봤는지는 앱이 기억하고, 펼침면이든 웹툰 스크롤이든 책에 맞는 방향으로 넘깁니다.',
+    img: doujinViewer,
+    alt: '동인메뉴판 뷰어, 더블 페이지 보기',
+  },
+];
+
+const grid = [
+  {
+    title: '작가 이름만 치면 됩니다',
+    body: 'artist: 뒤에 이름, tag: 뒤에 태그. 보기 싫은 건 -tag: 로 뺍니다. 매번 치기 귀찮은 조합은 프리셋으로 한 번만 저장합니다.',
+    img: doujinSearch,
+    alt: '동인메뉴판 접두어 검색과 프리셋',
+  },
+  {
+    title: '그 작가 책은 다 여기 있습니다',
+    body: '작가·태그·시리즈·그룹·캐릭터별로 묶어서 보여줍니다. 한 명 골라 들어가면 그 사람 책만 쭉 나옵니다.',
+    img: doujinBrowse,
+    alt: '동인메뉴판 둘러보기, 작가별 최근 작품 표지',
+  },
+  {
+    title: '시리즈는 알아서 묶입니다',
+    body: '제목과 메타데이터를 보고 같은 시리즈를 자동으로 묶습니다. 틀리면 합치거나 나누면 됩니다.',
+    img: doujinSeries,
+    alt: '동인메뉴판 시리즈 화면, 자동 감지된 시리즈 카드들',
+  },
+  {
+    title: '신작은 알아서 찾아옵니다',
+    body: '작가나 태그 조합을 구독해 두면 앱을 켤 때 새 작품이 있는지 확인해서 알려줍니다. 받기 버튼 하나면 큐에 들어갑니다.',
+    img: doujinSubscription,
+    alt: '동인메뉴판 다운로더, 구독 관리 패널이 열린 상태',
+  },
+  {
+    title: '다운로드도 라이브러리 안에서',
+    body: '따로 받아서 옮길 필요가 없습니다. 검색해서 고르면 큐에 들어가고, 받자마자 CBZ로 묶여 라이브러리에 자리 잡습니다. 멈췄다 이어 받기, 재시작 후 복구도 됩니다.',
+    img: doujinQueue,
+    alt: '동인메뉴판 다운로드 큐, 다운로드 중·대기 중 항목',
+  },
+  {
+    title: '같은 책이 두 권이면 알려줍니다',
+    body: '같은 ID, 같은 제목, 같은 표지를 기준으로 중복 사본을 찾아 한 화면에 모읍니다. 뭘 지울지만 고르면 됩니다.',
+    img: doujinDuplicates,
+    alt: '동인메뉴판 중복 정리 화면, 중복 그룹',
+  },
+  {
+    title: '뭘 제일 많이 봤는지 나옵니다',
+    body: '가장 많이 본 작가, 가장 자주 편 책, 별점을 제일 후하게 준 태그. 완독한 건 몇 권이고 읽다 만 건 몇 권인지, 하루에 얼마나 들여다봤는지까지 통계로 나옵니다. 내 취향을 앱이 먼저 압니다.',
+    img: doujinStats,
+    alt: '동인메뉴판 통계 화면, 읽기 진행·별점 분포·자주 본 작가',
+    wide: true,
+  },
+];
+
+const chips = [
+  '폴더·ZIP·CBZ 그대로 읽기',
+  'Hitomi-Downloader info.txt 메타 인식',
+  'artist: tag: -tag: 접두어 검색',
+  '읽음 상태·폴더별 필터',
+  '별점·즐겨찾기',
+  '검색 프리셋',
+  '작가·태그·시리즈·그룹·캐릭터 둘러보기',
+  '읽기 기록',
+  '이용 통계',
+  '시리즈 자동 묶기',
+  '시리즈 수동 병합·분할',
+  '시리즈 안에서 이전·다음 책',
+  '좌→우 · 우→좌 · 웹툰 스크롤',
+  '더블 페이지',
+  '이어읽기·북마크',
+  '마지막 장에서 다음 책 자동 이동',
+  '별도 창 열람',
+  '단축키 재설정',
+  '다운로드 큐 일시정지·재개·재시도',
+  '앱 재시작 시 큐 복구',
+  'CBZ 자동 압축',
+  '검색어 구독 신작 알림',
+  'ID·제목·표지 기준 중복 정리',
+  '테마 40종 이상',
+  '앱 잠금',
+  '데이터베이스 백업·복원',
+  '자동 업데이트',
+  '설치형·무설치형',
+  'Windows 10 이상',
+  'MIT 무료',
+];
+---
+
+<Base
+  title="동인메뉴판 기능 | qqoro"
+  description="폴더만 넣으면 메타데이터가 채워지고 시리즈가 묶이는 Windows 만화 라이브러리·뷰어·다운로더. 동인메뉴판이 하는 일 전부."
+  ogImage="/og-doujin.png"
+>
+  <Nav current="doujin" />
+  <FeatureHead
+    kicker="기능 소개"
+    name="동인메뉴판"
+    lede="모으고, 정리하고, 읽는 걸 한곳에서. 손 갈 일은 거의 없습니다."
+    repo={repo}
+    release={release}
+    warm
+  />
+  <FeatureLead items={lead} warm />
+  <FeatureGrid items={grid} warm />
+  <FeatureChips title="전부 다 적어보면" lede="위에 못 담은 것까지 한 줄씩." items={chips} warm />
+  <CrossLink lead="게임은 이쪽" name="야식메뉴판 Plus" href="/yasig-menu-plus.html" />
+  <Footer />
+</Base>

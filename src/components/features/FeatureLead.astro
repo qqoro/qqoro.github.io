@@ -1,0 +1,104 @@
+---
+import Shot from './Shot.astro';
+
+export interface LeadItem {
+  title: string;
+  body: string;
+  img: ImageMetadata | null;
+  alt: string;
+}
+interface Props {
+  items: LeadItem[];
+  warm?: boolean;
+}
+const { items, warm = false } = Astro.props;
+---
+
+<section class:list={['lead', 'wrap', { 'lead--warm': warm }]}>
+  {
+    items.map((it, i) => (
+      <article class:list={['row', { 'row--flip': i % 2 === 1 }]}>
+        <div class="fig">
+          <Shot img={it.img} alt={it.alt} width={1400} motion />
+        </div>
+        <div class="panel reveal">
+          <h2>{it.title}</h2>
+          <p>{it.body}</p>
+        </div>
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  .lead {
+    display: grid;
+    gap: var(--space-3xl);
+    padding: var(--space-3xl) 0 var(--space-2xl);
+  }
+  /* 설명 패널이 스크린샷 모서리를 한 칸만 덮는다 */
+  .row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: end;
+  }
+  .fig {
+    grid-column: 1 / 9;
+    grid-row: 1;
+  }
+  .panel {
+    grid-column: 8 / 13;
+    grid-row: 1;
+    position: relative;
+    z-index: 1;
+    margin-bottom: calc(-1 * var(--space-xl));
+    padding: var(--space-xl);
+    background: var(--color-paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+  .row--flip .fig {
+    grid-column: 5 / 13;
+  }
+  .row--flip .panel {
+    grid-column: 1 / 6;
+  }
+  .panel h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+    word-break: keep-all; /* 줄이 넘어가도 어절 사이에서만 끊는다 */
+    color: var(--color-accent);
+    text-shadow: 0 0 18px var(--color-glow);
+  }
+  .lead--warm .panel h2 {
+    color: var(--color-accent-2);
+    text-shadow: 0 0 18px var(--color-glow-2);
+  }
+  .panel p {
+    margin: var(--space-md) 0 0;
+    color: var(--color-ink-2);
+  }
+  @media (max-width: 900px) {
+    .lead {
+      gap: var(--space-2xl);
+    }
+    .row {
+      grid-template-columns: 1fr;
+    }
+    .fig,
+    .row--flip .fig {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .panel,
+    .row--flip .panel {
+      grid-column: 1;
+      grid-row: 2;
+      margin: calc(-1 * var(--space-lg)) var(--space-md) 0;
+      padding: var(--space-lg);
+    }
+  }
+</style>

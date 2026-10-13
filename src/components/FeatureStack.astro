@@ -1,0 +1,195 @@
+---
+import { Image } from 'astro:assets';
+import IconDownload from './IconDownload.astro';
+import yasigLibrary from '../assets/screenshots/yasig-library.png';
+import yasigDetail from '../assets/screenshots/yasig-detail.png';
+import yasigStats from '../assets/screenshots/yasig-2.png';
+import doujinSubscription from '../assets/screenshots/doujin-subscription.png';
+import doujinSeries from '../assets/screenshots/doujin-series.png';
+import doujinDuplicates from '../assets/screenshots/doujin-duplicates.png';
+
+type Shot = {
+  title: string;
+  body: string;
+  img: ImageMetadata;
+  alt: string;
+};
+
+const blocks = [
+  {
+    id: 'yasig',
+    lead: '게임은',
+    name: '야식메뉴판 Plus',
+    desc: '폴더를 지정하는 것 말고는 할 일이 없습니다.',
+    download: 'https://github.com/qqoro/yasig-menu-plus/releases/latest',
+    more: '/yasig-menu-plus.html',
+    warm: false,
+    shots: [
+      {
+        title: '폴더를 넣으면 메뉴판이 됩니다',
+        body: '게임 폴더 경로 하나면 끝입니다. 하위 폴더를 훑어 썸네일 갤러리로 펼치고, 압축 파일도 풀지 않고 그대로 인식합니다. 태그·서클·별점·클리어 여부로 걸러서 봅니다.',
+        img: yasigLibrary,
+        alt: '야식메뉴판 Plus 라이브러리, 필터 패널이 열린 상태',
+      },
+      {
+        title: '정보는 묻지 않고 채워집니다',
+        body: '폴더 이름에 RJ01234567 같은 번호만 있으면 DLSite에서 썸네일·서클·태그·평점·판매 수를 받아옵니다. Steam은 ST, Getchu는 GC, Ci-en도 됩니다. 일본어 제목은 한국어로 번역해 둡니다. 새 폴더를 넣으면 창을 켤 때 알아서 반영됩니다.',
+        img: yasigDetail,
+        alt: '야식메뉴판 Plus 게임 상세 화면, 수집된 메타데이터',
+      },
+      {
+        title: '얼마나 했는지도 기록됩니다',
+        body: '실행부터 종료까지 플레이 시간을 재고, 요일별·시간대별로 보여줍니다. 별점 분포로 어떤 게임을 좋아하는지까지.',
+        img: yasigStats,
+        alt: '야식메뉴판 Plus 플레이 통계 대시보드',
+      },
+    ] as Shot[],
+  },
+  {
+    id: 'doujin',
+    lead: '만화는',
+    name: '동인메뉴판',
+    desc: '모으고, 정리하고, 읽는 걸 한곳에서. 손 갈 일은 거의 없습니다.',
+    download: 'https://github.com/qqoro/doujin-menu/releases/latest',
+    more: '/doujin-menu.html',
+    warm: true,
+    shots: [
+      {
+        title: '신작은 알아서 찾아옵니다',
+        body: '작가나 태그 조합을 구독해 두면, 앱을 켤 때 새 작품이 있는지 확인해서 알려줍니다. 받기 버튼 하나면 큐에 들어가고, 받자마자 라이브러리에 자리 잡습니다.',
+        img: doujinSubscription,
+        alt: '동인메뉴판 다운로더, 구독 관리 패널이 열린 상태',
+      },
+      {
+        title: '시리즈는 알아서 묶입니다',
+        body: '제목과 작가를 보고 같은 시리즈를 자동으로 묶습니다. 틀리면 수동으로 합치거나 나누면 됩니다. 뷰어에서 마지막 장을 넘기면 목록의 다음 책이 바로 열립니다.',
+        img: doujinSeries,
+        alt: '동인메뉴판 시리즈 화면, 자동 감지된 시리즈 카드들',
+      },
+      {
+        title: '같은 책이 두 권이면 알려줍니다',
+        body: '제목이 달라도 표지가 같으면 중복으로 잡아냅니다. 뭘 지울지만 고르면 됩니다. 수천 권 모아도 정리가 됩니다.',
+        img: doujinDuplicates,
+        alt: '동인메뉴판 중복 정리 화면, 제목·ID·표지 유사로 묶인 중복 그룹',
+      },
+    ] as Shot[],
+  },
+];
+---
+
+<section class="stack wrap">
+  {
+    blocks.map((b) => (
+      <div class:list={['block', { 'block--warm': b.warm }]} id={b.id}>
+        <div class="sticky">
+          <h2>
+            {b.lead}
+            <br />
+            <span>{b.name}</span>
+          </h2>
+          <p>{b.desc}</p>
+          <div class="cta">
+            <a class:list={['btn', { 'btn--warm': b.warm }]} href={b.download} rel="noopener">
+              <IconDownload /> 다운로드
+            </a>
+            <a class="btn btn--ghost" href={b.more}>
+              모든 기능 보기
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </div>
+        <div class="scroll">
+          {b.shots.map((s) => (
+            <div class="shot" data-motion="shot">
+              <figure>
+                <Image src={s.img} alt={s.alt} width={1400} format="webp" quality={78} loading="lazy" />
+              </figure>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .stack {
+    padding: var(--space-xl) 0 var(--space-3xl);
+  }
+  .block {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--space-2xl);
+    padding: var(--space-2xl) 0;
+    border-top: 1px solid var(--rule);
+    scroll-margin-top: var(--space-xl);
+  }
+  .sticky {
+    position: sticky;
+    top: var(--space-3xl);
+    align-self: start;
+  }
+  .sticky h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-display-s);
+    line-height: 1.08;
+  }
+  .sticky h2 span {
+    color: var(--color-accent);
+    text-shadow: 0 0 18px var(--color-glow);
+  }
+  .block--warm .sticky h2 span {
+    color: var(--color-accent-2);
+    text-shadow: 0 0 18px var(--color-glow-2);
+  }
+  .sticky p {
+    color: var(--color-ink-2);
+    max-width: 46ch;
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+  .scroll {
+    display: grid;
+    gap: var(--space-xl);
+    perspective: 1200px;
+  }
+  .shot {
+    display: grid;
+    gap: var(--space-md);
+  }
+  .shot figure {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    background: var(--color-paper-2);
+    box-shadow: var(--shadow-card);
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .shot h3 {
+    font-size: var(--text-lg);
+  }
+  .shot p {
+    margin: 4px 0 0;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+  }
+  @media (max-width: 900px) {
+    .block {
+      grid-template-columns: 1fr;
+    }
+    .sticky {
+      position: static;
+    }
+  }
+</style>
