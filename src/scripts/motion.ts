@@ -4,19 +4,12 @@
  */
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!reduced) init();
 
 function init() {
   gsap.registerPlugin(ScrollTrigger);
-
-  // 관성 스크롤. ScrollTrigger와 같은 ticker를 쓰게 묶는다
-  const lenis = new Lenis({ lerp: 0.09, smoothWheel: true, anchors: { offset: -24 } });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((t) => lenis.raf(t * 1000));
-  gsap.ticker.lagSmoothing(0);
 
   ignite();
   heroParallax();
