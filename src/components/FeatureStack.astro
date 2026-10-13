@@ -6,7 +6,7 @@ import yasigDetail from '../assets/screenshots/yasig-detail.png';
 import yasigStats from '../assets/screenshots/yasig-2.png';
 import doujinSubscription from '../assets/screenshots/doujin-subscription.png';
 import doujinSeries from '../assets/screenshots/doujin-series.png';
-import doujinDuplicates from '../assets/screenshots/doujin-duplicates.png';
+import doujinLibrary from '../assets/screenshots/doujin-library.png';
 
 type Shot = {
   title: string;
@@ -55,22 +55,22 @@ const blocks = [
     warm: true,
     shots: [
       {
+        title: '폴더째로 넣으면 끝입니다',
+        body: 'ZIP이든 CBZ든 풀지 않습니다. Hitomi-Downloader로 받은 책이면 info.txt를 읽어 작가·태그·시리즈까지 채워 둡니다. 넣고 나면 할 일이 없습니다.',
+        img: doujinLibrary,
+        alt: '동인메뉴판 라이브러리, 표지 격자',
+      },
+      {
         title: '신작은 알아서 찾아옵니다',
-        body: '작가나 태그 조합을 구독해 두면, 앱을 켤 때 새 작품이 있는지 확인해서 알려줍니다. 받기 버튼 하나면 큐에 들어가고, 받자마자 라이브러리에 자리 잡습니다.',
+        body: '작가나 태그 조합을 구독해 두면 앱을 켤 때 새 작품이 있는지 확인해서 알려줍니다. 받기 버튼 하나면 큐에 들어갑니다.',
         img: doujinSubscription,
         alt: '동인메뉴판 다운로더, 구독 관리 패널이 열린 상태',
       },
       {
         title: '시리즈는 알아서 묶입니다',
-        body: '제목과 작가를 보고 같은 시리즈를 자동으로 묶습니다. 틀리면 수동으로 합치거나 나누면 됩니다. 뷰어에서 마지막 장을 넘기면 목록의 다음 책이 바로 열립니다.',
+        body: '제목과 메타데이터를 보고 같은 시리즈를 자동으로 묶습니다. 틀리면 합치거나 나누면 됩니다.',
         img: doujinSeries,
         alt: '동인메뉴판 시리즈 화면, 자동 감지된 시리즈 카드들',
-      },
-      {
-        title: '같은 책이 두 권이면 알려줍니다',
-        body: '제목이 달라도 표지가 같으면 중복으로 잡아냅니다. 뭘 지울지만 고르면 됩니다. 수천 권 모아도 정리가 됩니다.',
-        img: doujinDuplicates,
-        alt: '동인메뉴판 중복 정리 화면, 제목·ID·표지 유사로 묶인 중복 그룹',
       },
     ] as Shot[],
   },
