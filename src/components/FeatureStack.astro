@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Zoomable from './Zoomable.astro';
 import IconDownload from './IconDownload.astro';
 import yasigLibrary from '../assets/screenshots/yasig-library.png';
 import yasigDetail from '../assets/screenshots/yasig-detail.png';
@@ -102,7 +102,7 @@ const blocks = [
           {b.shots.map((s) => (
             <div class="shot" data-motion="shot">
               <figure>
-                <Image src={s.img} alt={s.alt} width={1400} format="webp" quality={78} loading="lazy" />
+                <Zoomable img={s.img} alt={s.alt} width={1400} />
               </figure>
               <h3>{s.title}</h3>
               <p>{s.body}</p>
@@ -170,11 +170,6 @@ const blocks = [
     border: 1px solid var(--rule);
     background: var(--color-paper-2);
     box-shadow: var(--shadow-card);
-  }
-  .shot img {
-    display: block;
-    width: 100%;
-    height: auto;
   }
   .shot h3 {
     font-size: var(--text-lg);

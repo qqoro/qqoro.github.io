@@ -1,0 +1,29 @@
+---
+import { Image, getImage } from 'astro:assets';
+
+interface Props {
+  img: ImageMetadata;
+  alt: string;
+  /** 본문에 깔리는 크기. 확대본은 원본 해상도로 따로 뽑는다 */
+  width: number;
+}
+const { img, alt, width } = Astro.props;
+// 본문용은 줄여서 글자가 뭉개진다. 크게 보기는 원본 폭 그대로
+const full = await getImage({ src: img, format: 'webp', quality: 88 });
+---
+
+<a class="zoom" href={full.src} data-zoom data-astro-reload aria-label={`${alt}, 크게 보기`}>
+  <Image src={img} alt={alt} width={width} format="webp" quality={78} loading="lazy" />
+</a>
+
+<style>
+  .zoom {
+    display: block;
+    cursor: zoom-in;
+  }
+  .zoom :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

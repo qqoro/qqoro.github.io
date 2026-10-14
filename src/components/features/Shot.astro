@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Zoomable from '../Zoomable.astro';
 
 interface Props {
   img: ImageMetadata | null;
@@ -14,7 +14,7 @@ const { img, alt, width = 1200, motion = false } = Astro.props;
 <figure class="shot" data-motion={motion ? 'shot' : undefined}>
   {
     img ? (
-      <Image src={img} alt={alt} width={width} format="webp" quality={78} loading="lazy" />
+      <Zoomable img={img} alt={alt} width={width} />
     ) : (
       <div class="pending" role="img" aria-label={`${alt} (스크린샷 준비 중)`}>
         <span>스크린샷 준비 중</span>
@@ -31,8 +31,7 @@ const { img, alt, width = 1200, motion = false } = Astro.props;
     background: var(--color-paper-2);
     box-shadow: var(--shadow-card);
   }
-  /* 스크린샷은 1920×1080 그대로 보여준다. 자리표시만 같은 비율로 맞춘다 */
-  .shot img,
+  /* 자리표시만 스크린샷(1920×1080)과 같은 비율로 맞춘다 */
   .pending {
     display: block;
     width: 100%;
