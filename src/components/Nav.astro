@@ -7,7 +7,26 @@ const { current } = Astro.props;
 
 <nav class="nav" aria-label="주요">
   <a class="brand" href="/">
-    <img src="/favicon.svg" alt="" width="32" height="32" />
+    <!-- public/favicon.svg와 같은 그림. 파츠별로 움직이려고 인라인으로 넣는다 -->
+    <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true" data-motion="logo">
+      <clipPath id="logo-tile"><rect width="64" height="64" rx="16"></rect></clipPath>
+      <rect width="64" height="64" rx="16" fill="#10131a"></rect>
+      <g clip-path="url(#logo-tile)">
+        <g class="squash">
+          <!-- 한숨 쉴 때 몸통만 부풀고 얼굴은 크기를 유지해야 해서 둘을 나눈다 -->
+          <g class="body">
+            <path transform="rotate(7 32 32)" fill="#5ef2b4" d="M12 15C15 13 19 16 25 16.5C34 17 41 17 48 15C52 14 54 16 52.5 20.5C50.5 28 50.5 36 52.5 43.5C54 48 52 50 48 48.5C39 46.5 26 46.5 16 48.5C11 50 9 48 10.5 43.5C12.5 36 12.5 28 10.5 20.5C9.5 17.5 10 16 12 15Z"></path>
+          </g>
+          <g class="face">
+            <g transform="rotate(7 32 32)" fill="none" stroke="#10131a" stroke-linecap="round">
+              <path class="eyes" stroke-width="2.6" d="M22 31Q25 35 28 31M37 31Q40 35 43 31"></path>
+              <path stroke-width="2.2" d="M29.5 37Q32 40 34.5 37"></path>
+              <path stroke-width="1.4" d="M15 20Q16.5 23 19 23.5M45 41Q47.5 42 49 45"></path>
+            </g>
+          </g>
+        </g>
+      </g>
+    </svg>
     qqoro
   </a>
   <div class="links">
@@ -48,9 +67,8 @@ const { current } = Astro.props;
     color: var(--color-ink);
     letter-spacing: 0.01em;
   }
-  .brand img {
+  .brand svg {
     display: block;
-    border-radius: 8px;
   }
   .links {
     display: flex;

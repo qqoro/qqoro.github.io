@@ -11,11 +11,13 @@ if (!reduced) init();
 function init() {
   gsap.registerPlugin(ScrollTrigger);
 
+  logo();
   ignite();
   heroParallax();
   cards();
   shots();
   counters();
+  downloadIcons();
 }
 
 /** 텍스트 노드를 글자 단위 span으로 쪼갠다. 태그 구조(em, br 등)는 유지 */
@@ -99,6 +101,115 @@ function shots() {
         scrollTrigger: { trigger: el, start: 'top 96%', end: 'top 58%', scrub: 0.5 },
       },
     );
+  });
+}
+
+/** 감쇠 스프링 이징: 목표를 지나쳤다가 osc번 출렁이며 멈춘다 */
+function spring(osc: number, decay: number) {
+  return (t: number) => (t >= 1 ? 1 : 1 - Math.exp(-decay * t) * Math.cos(osc * 2 * Math.PI * t));
+}
+
+/** 자는 베개 로고: 떨어져 착지하고, 가끔 한숨을 쉬고, 올리면 묵직하게 눌렸다 돌아온다 */
+function logo() {
+  const svg = document.querySelector<SVGSVGElement>('[data-motion="logo"]');
+  const brand = svg?.closest<HTMLElement>('.brand');
+  const squash = svg?.querySelector('.squash');
+  const body = svg?.querySelector('.body');
+  const face = svg?.querySelector('.face');
+  const eyes = svg?.querySelector('.eyes');
+  if (!brand || !squash || !body || !face || !eyes) return;
+
+  // 베개 바닥 가운데를 기준으로 눌리고 부푼다
+  gsap.set([squash, body], { svgOrigin: '32 49' });
+  gsap.set(eyes, { svgOrigin: '32 32' });
+
+  const intro = gsap
+    .timeline({ delay: 0.15 })
+    .fromTo(squash, { y: -60, scaleY: 1.25, scaleX: 0.85 }, { y: 0, duration: 0.45, ease: 'power3.in' })
+    .to(squash, { scaleY: 0.78, scaleX: 1.15, duration: 0.08, ease: 'power2.out' })
+    .to(squash, { scaleX: 1, scaleY: 1, duration: 0.9, ease: spring(2, 6) });
+
+  // 한숨: 천천히 들이마셔 몸통이 부풀고(얼굴은 크기 그대로 따라 올라감), 푸우 내쉬며 살짝 꺼졌다 돌아온다
+  gsap
+    .timeline({ repeat: -1, repeatDelay: 4.5, delay: intro.duration() + 1.2 })
+    .to(body, { scaleY: 1.09, scaleX: 1.04, duration: 0.9, ease: 'sine.inOut' })
+    .to(face, { y: -1.5, duration: 0.9, ease: 'sine.inOut' }, '<')
+    .to(body, { scaleY: 0.96, scaleX: 1.03, duration: 0.45, ease: 'power1.out' }, '+=0.15')
+    .to(face, { y: 0.6, duration: 0.45, ease: 'power1.out' }, '<')
+    .to(body, { scaleY: 1, scaleX: 1, duration: 0.8, ease: spring(1, 6) })
+    .to(face, { y: 0, duration: 0.8, ease: spring(1, 6) }, '<');
+
+  // 호버: 묵직한 덩어리라 천천히 움츠렸다 눌리고, 출렁임은 한 번 반만
+  const settle = spring(1.5, 5);
+  const poke = gsap
+    .timeline({ paused: true })
+    .to(squash, { scaleY: 1.06, scaleX: 0.96, duration: 0.28, ease: 'power2.out' })
+    .to(squash, { scaleY: 0.8, scaleX: 1.12, duration: 0.22, ease: 'power2.in' })
+    .to(eyes, { scaleY: 0.4, duration: 0.22, ease: 'power2.in' }, '<')
+    .addLabel('settle')
+    .to(squash, { scaleX: 1, scaleY: 1, duration: 1.2, ease: settle }, 'settle')
+    .to(eyes, { scaleY: 1, duration: 0.9, ease: settle }, 'settle+=0.1');
+
+  const play = () => {
+    if (!intro.isActive() && !poke.isActive()) poke.restart();
+  };
+  brand.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'mouse') play();
+  });
+  brand.addEventListener('focus', () => {
+    if (brand.matches(':focus-visible')) play();
+  });
+}
+
+/** 다운로드 바닥. dip > 0이면 가운데가 트램펄린처럼 눌리고 옆면이 안쪽으로 기운다 */
+function trayD(dip: number) {
+  const s = dip * 0.35;
+  return `M${21 - s} 15L21 19a2 2 0 0 1-2 2Q12 ${21 + dip * 2} 5 21a2 2 0 0 1-2-2L${3 + s} 15`;
+}
+
+/** 다운로드 버튼에 올리면 화살표가 움츠렸다 떨어지고, 바닥과 버튼이 눌렸다 출렁인다 */
+function downloadIcons() {
+  const ease = spring(2, 6);
+  document.querySelectorAll<SVGSVGElement>('[data-motion="dl-icon"]').forEach((svg) => {
+    const btn = svg.closest<HTMLElement>('.btn');
+    const tray = svg.querySelector('.tray');
+    const arrow = svg.querySelector('.arrow');
+    const head = svg.querySelector('.head');
+    if (!btn || !tray || !arrow || !head) return;
+
+    const dip = { v: 0 };
+    const drawTray = () => tray.setAttribute('d', trayD(dip.v));
+    gsap.set([arrow, head], { svgOrigin: '12 15' });
+
+    const tl = gsap.timeline({ paused: true });
+    tl
+      // CSS transform 트랜지션이 매 프레임 값을 뒤쫓지 않도록 재생 중엔 그림자만 남긴다
+      .set(btn, { transformOrigin: '50% 100%', transition: 'box-shadow var(--dur-fast) var(--ease-out)' })
+      // 예비 동작 → 늘어나며 낙하
+      .to(arrow, { y: -1.6, scaleY: 0.86, scaleX: 1.1, duration: 0.2, ease: 'power2.out' })
+      .to(arrow, { y: 3.2, scaleY: 1.22, scaleX: 0.88, duration: 0.17, ease: 'power3.in' })
+      .addLabel('impact')
+      // 착지: 화살표는 납작, 촉은 벌어지고, 바닥과 버튼이 눌린다
+      .to(arrow, { scaleY: 0.74, scaleX: 1.15, duration: 0.07, ease: 'power2.out' }, 'impact')
+      .to(head, { scaleX: 1.14, scaleY: 0.8, duration: 0.07, ease: 'power2.out' }, 'impact')
+      .to(dip, { v: 1.1, duration: 0.07, ease: 'power2.out', onUpdate: drawTray }, 'impact')
+      .to(btn, { scaleY: 0.95, scaleX: 1.03, duration: 0.07, ease: 'power2.out' }, 'impact')
+      .addLabel('settle')
+      // 반동: 스프링으로 출렁이다 멈춘다. 촉은 한 박자 늦게 따라온다
+      .to(arrow, { y: 0, scaleX: 1, scaleY: 1, duration: 0.9, ease }, 'settle')
+      .to(dip, { v: 0, duration: 1, ease, onUpdate: drawTray }, 'settle')
+      .to(head, { scaleX: 1, scaleY: 1, duration: 0.8, ease }, 'settle+=0.06')
+      .to(btn, { scaleX: 1, scaleY: 1, duration: 0.7, ease, clearProps: 'transform,transition' }, 'settle');
+
+    const play = () => {
+      if (!tl.isActive()) tl.restart();
+    };
+    btn.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'mouse') play();
+    });
+    btn.addEventListener('focus', () => {
+      if (btn.matches(':focus-visible')) play();
+    });
   });
 }
 
