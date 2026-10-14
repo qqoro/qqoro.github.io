@@ -11,13 +11,23 @@ if (!reduced) init();
 function init() {
   gsap.registerPlugin(ScrollTrigger);
 
+  // 로고는 transition:persist로 페이지를 옮겨도 남으므로 처음 한 번만 붙인다
   logo();
-  ignite();
-  heroParallax();
-  cards();
-  shots();
-  counters();
-  downloadIcons();
+
+  // ClientRouter가 body를 갈아 끼우므로 페이지 연출은 매 페이지 새로 붙이고,
+  // 교체 직전에 이전 페이지의 트윈과 ScrollTrigger를 되돌린다
+  let page: gsap.Context | undefined;
+  document.addEventListener('astro:page-load', () => {
+    page = gsap.context(() => {
+      ignite();
+      heroParallax();
+      cards();
+      shots();
+      counters();
+      downloadIcons();
+    });
+  });
+  document.addEventListener('astro:before-swap', () => page?.revert());
 }
 
 /** 텍스트 노드를 글자 단위 span으로 쪼갠다. 태그 구조(em, br 등)는 유지 */

@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -37,6 +38,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
     />
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet" />
+    <ClientRouter />
   </head>
   <body>
     <slot />
@@ -44,18 +46,32 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       import '../scripts/motion';
     </script>
     <script>
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) {
-              e.target.classList.add('in');
-              io.unobserve(e.target);
+      // 번들 스크립트는 한 번만 실행되므로 페이지마다 새 .reveal을 다시 감시한다
+      let io: IntersectionObserver | undefined;
+      document.addEventListener('astro:page-load', () => {
+        io?.disconnect();
+        io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io?.unobserve(e.target);
+              }
             }
-          }
-        },
-        { threshold: 0.12 },
-      );
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+          },
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll('.reveal').forEach((el) => io?.observe(el));
+      });
+
+      // 뒤로가기 때 라우터의 스크롤 복원이 CSS smooth를 타고 스르륵 미끄러지지 않게, 교체하는 동안만 끈다.
+      // 교체 시 <html> 속성은 새 문서 것으로 덮이므로 새 문서 쪽에 건다
+      document.addEventListener('astro:before-swap', (e) => {
+        e.newDocument.documentElement.style.scrollBehavior = 'auto';
+      });
+      document.addEventListener('astro:page-load', () => {
+        requestAnimationFrame(() => document.documentElement.style.removeProperty('scroll-behavior'));
+      });
     </script>
   </body>
 </html>

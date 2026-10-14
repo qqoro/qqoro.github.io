@@ -6,7 +6,8 @@ const { current } = Astro.props;
 ---
 
 <nav class="nav" aria-label="주요">
-  <a class="brand" href="/">
+  <!-- 페이지를 옮겨도 로고 연출이 이어지도록 남긴다. 링크째 남겨야 호버 리스너도 산다 -->
+  <a class="brand" href="/" transition:persist="brand">
     <!-- public/favicon.svg와 같은 그림. 파츠별로 움직이려고 인라인으로 넣는다 -->
     <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true" data-motion="logo">
       <clipPath id="logo-tile"><rect width="64" height="64" rx="16"></rect></clipPath>
