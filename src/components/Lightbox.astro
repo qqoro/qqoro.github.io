@@ -1,6 +1,6 @@
 ---
-// 스크린샷 크게 보기. [data-zoom] 링크를 누르면 원본을 화면에 맞춰 띄우고,
-// 화면보다 큰 원본은 한 번 더 누르면 실제 크기로 펼쳐 스크롤로 훑는다
+// 스크린샷 크게 보기. [data-zoom] 링크를 누르면 썸네일 자리에서 화면 가운데로 커지며 원본을 띄우고,
+// 어디를 누르든 원래 자리로 줄어들며 닫는다
 ---
 
 <dialog class="lightbox" aria-label="스크린샷 크게 보기">
@@ -11,54 +11,166 @@
 </dialog>
 
 <script>
+  const EASE = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
+  const OPEN_MS = 420;
+  const CLOSE_MS = 320;
+
+  let thumb: HTMLImageElement | null = null;
+
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /** 대화상자 속 이미지에서 썸네일 자리까지의 변환 */
+  function toThumb(img: HTMLImageElement, from: HTMLImageElement) {
+    const a = from.getBoundingClientRect();
+    const b = img.getBoundingClientRect();
+    const x = a.left + a.width / 2 - (b.left + b.width / 2);
+    const y = a.top + a.height / 2 - (b.top + b.height / 2);
+    return `translate(${x}px, ${y}px) scale(${a.width / b.width}, ${a.height / b.height})`;
+  }
+
+  function fade(dialog: HTMLDialogElement, from: number, to: number, ms: number) {
+    const opts = { duration: ms, easing: EASE, fill: 'both' as const };
+    const frames = [{ opacity: from }, { opacity: to }];
+    dialog.animate(frames, { ...opts, pseudoElement: '::backdrop' });
+    return dialog.querySelector('.close')!.animate(frames, opts);
+  }
+
+  function open(dialog: HTMLDialogElement, link: HTMLAnchorElement) {
+    const img = dialog.querySelector('img')!;
+    // 아직 돌아가는 중인 이전 복제본은 치운다
+    document.querySelectorAll('.lightbox-ghost, .lightbox-veil').forEach((el) => el.remove());
+    thumb = link.querySelector('img');
+    // 원본을 받는 동안 이미 받아 둔 썸네일로 먼저 띄우고, 다 오면 바꿔 끼운다 (비율이 같아 튀지 않는다)
+    img.src = thumb?.currentSrc || link.href;
+    img.alt = thumb?.alt ?? '';
+    img.style.setProperty('--w', link.dataset.w ?? '1920');
+    img.style.setProperty('--h', link.dataset.h ?? '1080');
+    const full = new Image();
+    full.onload = () => {
+      if (dialog.open && thumb === link.querySelector('img')) img.src = full.src;
+    };
+    full.src = link.href;
+
+    dialog.showModal();
+    if (!thumb || still()) return;
+    img.animate([{ transform: toThumb(img, thumb) }, { transform: 'none' }], { duration: OPEN_MS, easing: EASE });
+    fade(dialog, 0, 1, OPEN_MS);
+    thumb.style.visibility = 'hidden';
+  }
+
+  /** CSS cubic-bezier와 같은 곡선. 닫기는 매 프레임 직접 그려서 필요하다 */
+  function bezier(x1: number, y1: number, x2: number, y2: number) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const X = (t: number) => ((ax * t + bx) * t + cx) * t;
+    return (x: number) => {
+      let lo = 0, hi = 1;
+      for (let i = 0; i < 20; i++) {
+        const m = (lo + hi) / 2;
+        if (X(m) < x) lo = m;
+        else hi = m;
+      }
+      const t = (lo + hi) / 2;
+      return ((ay * t + by) * t + cy) * t;
+    };
+  }
+  const ease = bezier(0.2, 0.7, 0.2, 1);
+
+  /**
+   * 대화상자는 바로 닫아 뒤 페이지를 풀어 주고, 겉모습만 복제해 썸네일 자리로 돌려보낸다.
+   * 스크롤로 닫으면 썸네일이 움직이는 중이므로 도착점을 매 프레임 다시 잰다
+   */
+  function close(dialog: HTMLDialogElement) {
+    const img = dialog.querySelector('img')!;
+    const from = img.getBoundingClientRect();
+    const target = thumb;
+    dialog.close();
+    dialog.getAnimations({ subtree: true }).forEach((a) => a.cancel());
+    if (!target || !target.isConnected || still()) {
+      if (target) target.style.visibility = '';
+      return;
+    }
+
+    const ghost = img.cloneNode() as HTMLImageElement;
+    ghost.className = 'lightbox-ghost';
+    Object.assign(ghost.style, { left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px` });
+    const veil = document.createElement('div');
+    veil.className = 'lightbox-veil';
+    document.body.append(veil, ghost);
+
+    const start = performance.now();
+    const frame = (now: number) => {
+      const t = Math.min((now - start) / CLOSE_MS, 1);
+      const p = t < 1 ? ease(t) : 1;
+      const to = target.getBoundingClientRect();
+      const x = (to.left - from.left) * p;
+      const y = (to.top - from.top) * p;
+      const sx = 1 + (to.width / from.width - 1) * p;
+      const sy = 1 + (to.height / from.height - 1) * p;
+      ghost.style.transform = `translate(${x}px, ${y}px) scale(${sx}, ${sy})`;
+      veil.style.opacity = String(1 - p);
+      if (t < 1) return requestAnimationFrame(frame);
+      // 돌아오는 도중 같은 그림을 다시 열었다면 썸네일은 계속 숨겨 둔다
+      if (!(dialog.open && thumb === target)) target.style.visibility = '';
+      ghost.remove();
+      veil.remove();
+    };
+    requestAnimationFrame(frame);
+  }
+
   // 번들 스크립트는 한 번만 돈다. 대화상자는 페이지마다 새로 깔리므로 누를 때마다 다시 찾는다
   document.addEventListener('click', (e) => {
     const target = e.target as Element;
-    const link = target.closest<HTMLAnchorElement>('a[data-zoom]');
     const dialog = document.querySelector<HTMLDialogElement>('dialog.lightbox');
     if (!dialog) return;
-
+    const link = target.closest<HTMLAnchorElement>('a[data-zoom]');
     if (link) {
       e.preventDefault();
-      const img = dialog.querySelector('img')!;
-      dialog.classList.remove('actual', 'can-actual');
-      img.src = link.href;
-      img.alt = link.querySelector('img')?.alt ?? '';
-      dialog.showModal();
-      // 같은 그림을 다시 열면 load가 안 오므로 이미 받아 둔 경우 직접 잰다
-      if (img.complete) requestAnimationFrame(() => measure(img));
+      open(dialog, link);
       return;
     }
-    if (!dialog.open || !dialog.contains(target)) return;
-
-    // 원본이 화면보다 커서 줄여 보이는 중일 때만 실제 크기로 넘긴다
-    if (target instanceof HTMLImageElement && (dialog.classList.contains('can-actual') || dialog.classList.contains('actual'))) {
-      const actual = dialog.classList.toggle('actual');
-      if (actual) {
-        // 누른 지점이 화면 가운데 오도록 펼친다
-        const r = target.getBoundingClientRect();
-        const fx = (e as MouseEvent).clientX - r.left;
-        const fy = (e as MouseEvent).clientY - r.top;
-        const scale = target.naturalWidth / r.width;
-        requestAnimationFrame(() => {
-          dialog.scrollTo(fx * scale - dialog.clientWidth / 2, fy * scale - dialog.clientHeight / 2);
-        });
-      }
-      return;
-    }
-    // 이미지 바깥(배경)이나 닫기 버튼
-    dialog.close();
+    // 이미지든 배경이든 닫기 버튼이든
+    if (dialog.open && dialog.contains(target)) close(dialog);
   });
 
-  // 이미지가 실제로 줄어 들어갔는지는 그려진 뒤에야 안다
-  function measure(img: HTMLImageElement) {
-    img.closest('dialog')?.classList.toggle('can-actual', img.naturalWidth > img.clientWidth + 1);
-  }
+  // 스크롤하려 들면 닫는다. 확대(ctrl+휠, 두 손가락 핀치)는 글자를 보려는 것이라 닫지 않는다
+  const openDialog = () => document.querySelector<HTMLDialogElement>('dialog.lightbox[open]');
   document.addEventListener(
-    'load',
+    'wheel',
     (e) => {
-      const img = e.target as Element;
-      if (img instanceof HTMLImageElement && img.closest('dialog.lightbox')) measure(img);
+      const dialog = openDialog();
+      if (!dialog || e.ctrlKey || Math.abs(e.deltaY) <= 2) return;
+      close(dialog);
+    },
+    { passive: true },
+  );
+  let touchY: number | null = null;
+  document.addEventListener(
+    'touchstart',
+    (e) => {
+      touchY = e.touches.length === 1 ? e.touches[0].clientY : null;
+    },
+    { passive: true },
+  );
+  document.addEventListener(
+    'touchmove',
+    (e) => {
+      const dialog = openDialog();
+      if (!dialog || touchY === null) return;
+      if (e.touches.length !== 1) touchY = null;
+      else if (Math.abs(e.touches[0].clientY - touchY) > 30) close(dialog);
+    },
+    { passive: true },
+  );
+
+  // ESC도 바로 닫지 않고 줄어들며 닫는다
+  document.addEventListener(
+    'cancel',
+    (e) => {
+      const dialog = e.target as Element;
+      if (!(dialog instanceof HTMLDialogElement) || !dialog.matches('.lightbox')) return;
+      e.preventDefault();
+      close(dialog);
     },
     true,
   );
@@ -76,35 +188,45 @@
     background: transparent;
     color: var(--color-ink);
     overflow: hidden;
+    cursor: zoom-out;
   }
   .lightbox[open] {
     display: grid;
     place-items: center;
   }
-  .lightbox::backdrop {
-    background: oklch(8% 0.01 260 / 0.88);
+  .lightbox::backdrop,
+  :global(.lightbox-veil) {
+    background: oklch(8% 0.01 260 / 0.6);
     backdrop-filter: blur(6px);
   }
-  .lightbox img {
-    max-width: calc(100vw - 2 * var(--space-lg));
-    max-height: calc(100dvh - 2 * var(--space-lg));
-    width: auto;
-    height: auto;
+  /* 닫힐 때 남기는 겉모습. 클릭과 휠은 그대로 뒤 페이지로 통과시킨다 */
+  :global(.lightbox-veil),
+  :global(.lightbox-ghost) {
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  :global(.lightbox-veil) {
+    inset: 0;
+  }
+  :global(.lightbox-ghost) {
+    margin: 0;
+    transform-origin: 0 0;
+    will-change: transform;
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-card);
   }
-  .lightbox.can-actual img {
-    cursor: zoom-in;
-  }
-  .lightbox.actual {
-    overflow: auto;
-    place-items: start;
-  }
-  .lightbox.actual img {
-    max-width: none;
-    max-height: none;
-    border-radius: 0;
-    cursor: zoom-out;
+  /* 썸네일에서 원본으로 바꿔 끼워도 크기가 튀지 않게, 원본 크기(--w, --h) 기준으로 화면에 맞춘다 */
+  .lightbox img {
+    width: min(
+      calc(var(--w) * 1px),
+      calc(100vw - 2 * var(--space-lg)),
+      calc((100dvh - 2 * var(--space-lg)) * var(--w) / var(--h))
+    );
+    height: auto;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    will-change: transform;
   }
   .close {
     position: fixed;
@@ -122,20 +244,5 @@
   }
   .close:hover {
     background: var(--color-paper-3);
-  }
-  /* 열려 있는 동안 뒤 페이지가 같이 굴러가지 않게 */
-  :global(html:has(dialog.lightbox[open])) {
-    overflow: hidden;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .lightbox[open],
-    .lightbox[open]::backdrop {
-      animation: lightbox-in var(--dur-base) var(--ease-out);
-    }
-  }
-  @keyframes lightbox-in {
-    from {
-      opacity: 0;
-    }
   }
 </style>

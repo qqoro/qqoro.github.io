@@ -12,7 +12,15 @@ const { img, alt, width } = Astro.props;
 const full = await getImage({ src: img, format: 'webp', quality: 88 });
 ---
 
-<a class="zoom" href={full.src} data-zoom data-astro-reload aria-label={`${alt}, 크게 보기`}>
+<a
+  class="zoom"
+  href={full.src}
+  data-zoom
+  data-w={img.width}
+  data-h={img.height}
+  data-astro-reload
+  aria-label={`${alt}, 크게 보기`}
+>
   <Image src={img} alt={alt} width={width} format="webp" quality={78} loading="lazy" />
 </a>
 
