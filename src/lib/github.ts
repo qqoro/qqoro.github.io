@@ -36,8 +36,11 @@ interface Release {
   html_url: string;
   draft: boolean;
   prerelease: boolean;
-  assets: { download_count: number }[];
+  assets: { name: string; download_count: number }[];
 }
+
+// latest.yml·blockmap은 자동 업데이트가 확인할 때마다 받아 가므로 세지 않는다. 설치형·포터블 exe만
+const isInstaller = (name: string) => name.endsWith('.exe');
 
 export async function fetchRelease(repo: string): Promise<ReleaseInfo | null> {
   const all: Release[] = [];
@@ -50,7 +53,7 @@ export async function fetchRelease(repo: string): Promise<ReleaseInfo | null> {
   const latest = all.find((r) => !r.draft && !r.prerelease);
   if (!latest) return null;
   const downloads = all.reduce(
-    (sum, r) => sum + r.assets.reduce((s, a) => s + a.download_count, 0),
+    (sum, r) => sum + r.assets.reduce((s, a) => (isInstaller(a.name) ? s + a.download_count : s), 0),
     0,
   );
   return {
